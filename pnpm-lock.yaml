@@ -2,12 +2,14 @@ lockfileVersion: 5.4
 
 specifiers:
   lil-gui: ^0.18.2
+  reset-css: ^5.0.2
   sass: ^1.67.0
   three: ^0.156.1
   vite: ^4.4.5
 
 devDependencies:
   lil-gui: 0.18.2
+  reset-css: 5.0.2
   sass: 1.67.0
   three: 0.156.1
   vite: 4.4.9_sass@1.67.0
@@ -365,6 +367,10 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+    dev: true
+
+  /reset-css/5.0.2:
+    resolution: {integrity: sha512-YtgUGSq5z5W0NPSjsBW7ys7rtWa8P8AiE7S6Fg3d1TQCPpAodgYyLuZYlU0AOsLtprk/fC9ormHN/0pAavVIDw==}
     dev: true
 
   /rollup/3.29.2:
