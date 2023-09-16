@@ -1,0 +1,17 @@
+{
+  "name": "clock-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "lil-gui": "^0.18.2",
+    "sass": "^1.67.0",
+    "three": "^0.156.1",
+    "vite": "^4.4.5"
+  }
+}
