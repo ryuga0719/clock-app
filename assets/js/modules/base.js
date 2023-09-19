@@ -1,13 +1,19 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import ClockHand from "./clock-hand";
+import Utility from "./utils/utility";
 
 export default class Base {
   scene;
   renderer;
   camera;
   canvasElement;
+  minutesGroup;
+  timeGroup;
 
   constructor() {
+    this.clockHand = new ClockHand(); // 時計の針
+
     // レンダラーの設定
     this.setRenderer();
 
@@ -23,15 +29,21 @@ export default class Base {
     // 光源表示
     this.setLight();
 
-    // 立方体の作成と配置
-    this.arrangeObjectsInCircle(60, 10);
+    // グループの作成
+    this.minutesGroup = Utility.createAndAddGroup(this.scene, null);
+    this.timeGroup = Utility.createAndAddGroup(this.scene, null);
 
-    // 立方体の作成
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshNormalMaterial({ color: 0x00ffff });
-    this.cube = new THREE.Mesh(geometry, material);
-    this.cube.position.set(0, 0, 0);
-    this.scene.add(this.cube);
+    // 立方体の作成と配置
+    this.arrangeObjectsInCircle(60, 10, -3, 3, this.minutesGroup); // 秒・分
+    this.arrangeObjectsInCircle(12, 20, -5, 5, this.timeGroup); // 時
+
+    // 時計の針を追加
+    this.scene.add(this.clockHand.createClockHand(10, "secondHand", 0.01)); // 秒針
+    this.scene.add(this.clockHand.createClockHand(12, "minuteHand", 0.03)); // 分針
+    this.scene.add(this.clockHand.createClockHand(18, "timeHand", 0.05)); // 時針
+
+    // 中心の立方体の作成
+    this.createCenterObject();
 
     // 初期化関数呼び出し
     this.init();
@@ -43,11 +55,11 @@ export default class Base {
     // アニメーションループ
     const animate = () => {
       requestAnimationFrame(animate);
+      // this.minutesGroup.rotation.y += 0.01;
 
-      // 立方体をランダムに回転
-      this.cube.rotation.x += Math.random() * 0.1;
-      this.cube.rotation.y += Math.random() * 0.1;
-      this.cube.rotation.z += Math.random() * 0.1;
+      // this.scene.getObjectByName("secondHand").rotation.y -= 0.03; // 秒針
+      // this.scene.getObjectByName("minuteHand").rotation.y -= 0.02; // 秒針
+      // this.scene.getObjectByName("timeHand").rotation.y -= 0.01; // 分針
 
       // レンダリング
       this.renderer.render(this.scene, this.camera);
@@ -73,19 +85,36 @@ export default class Base {
     });
   }
 
-  // 円形にオブジェクトを配置
-  arrangeObjectsInCircle(numCubes, radius) {
+  /**
+   * キューブを円周上に配置する
+   *
+   * @param {*} numCubes - キューブの数
+   * @param {*} radius - 半径
+   * @param {*} deltaY - Yの変異
+   * @memberof Base
+   */
+  arrangeObjectsInCircle(numCubes, radius, randomMin, randomMax, group) {
     for (let i = 0; i < numCubes; i++) {
       const angle = (Math.PI * 2 * i) / numCubes; // 円周上の角度
       const x = radius * Math.cos(angle);
       const z = radius * Math.sin(angle);
 
       const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-      const material = new THREE.MeshNormalMaterial({ color: 0x00ff00 });
+      const material = new THREE.MeshNormalMaterial();
       const cube = new THREE.Mesh(geometry, material);
-      cube.position.set(x, 0, z);
-      this.scene.add(cube);
+      const delta = Utility.getRandomInt(randomMin, randomMax);
+      cube.position.set(x, delta, z);
+      group.add(cube);
     }
+  }
+
+  // 中心のオブジェクト作成
+  createCenterObject() {
+    const geometry = new THREE.SphereGeometry(0.5);
+    const material = new THREE.MeshNormalMaterial();
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.set(0, 0, 0);
+    this.scene.add(sphere);
   }
 
   // レンダラー設定
@@ -113,7 +142,7 @@ export default class Base {
     );
     this.camera.position.set(7, 7, 7);
 
-    const controls = new OrbitControls(this.camera, this.canvasElement);
+    new OrbitControls(this.camera, this.canvasElement);
   }
 
   // 光源設定
