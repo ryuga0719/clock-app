@@ -32,12 +32,14 @@ export default class ClockHand {
   }
 
   // 時針の初期位置を計算
-  calculateHourHandPosition(hour) {
+  calculateHourHandPosition(hour, minute) {
     // 1時間あたりの角度（ラジアン）
     const degreesPerHour = 360 / 12;
 
-    // 時針の位置を計算し、ラジアンに変換
-    const hourHandPosition = (hour % 12) * degreesPerHour * (Math.PI / 180);
+    // 時針の位置を計算し、分の影響も考慮してラジアンに変換
+    const hourHandPosition =
+      ((hour % 12) * degreesPerHour + (minute / 60) * degreesPerHour) *
+      (Math.PI / 180);
 
     return hourHandPosition;
   }
@@ -52,5 +54,23 @@ export default class ClockHand {
       (minutes % 60) * degreesPerMinute * (Math.PI / 180);
 
     return minuteHandPosition;
+  }
+
+  // 分針が1秒間に進む回転角
+  calculateMinuteRotationPerSecond() {
+    // 1分あたりの角度（ラジアン）
+    const degreesPerMinute = 360 / 60;
+
+    // 分針の1秒間の回転角をラジアンで計算
+    return (degreesPerMinute / 60) * (Math.PI / 180); // 60秒で1分
+  }
+
+  // 時針が1秒間に進む回転角
+  calculateHourRotationPerSecond() {
+    // 1時間あたりの角度（ラジアン）
+    const degreesPerHour = 360 / 12;
+
+    // 時針の1秒間の回転角をラジアンで計算
+    return (degreesPerHour / 3600) * (Math.PI / 180); // 3600秒で1時間
   }
 }

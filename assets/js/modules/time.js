@@ -5,7 +5,7 @@ export default class Time {
     this.minute = this.getJapaneseTime().minute; // 分
     this.second = this.getJapaneseTime().second; // 秒
 
-    console.log(this.hour, this.minute, this.second);
+    // console.log(this.hour, this.minute, this.second);
   }
 
   getJapaneseTime() {
