@@ -18,4 +18,22 @@ export default class Utility {
     }
     return group;
   }
+
+  /**
+   * 度数 → ラジアンに変換
+   * @param {number} val - 度数
+   * @return {number} ラジアン
+   */
+  static degree2Radian = (val) => {
+    return (val * Math.PI) / 180;
+  };
+
+  /**
+   * ラジアン → 度数に変換
+   * @param {number} val - ラジアン
+   * @return {number} 度数
+   */
+  static radian2Degree = (val) => {
+    return (val * 180) / Math.PI;
+  };
 }

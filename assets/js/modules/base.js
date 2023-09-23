@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import ClockHand from "./clock-hand";
 import Utility from "./utils/utility";
+import Time from "./time";
 
 export default class Base {
   scene;
@@ -12,6 +13,15 @@ export default class Base {
   timeGroup;
 
   constructor() {
+    // 時間設定
+    this.timeObj = new Time();
+
+    this.now = {
+      hour: this.timeObj.getJapaneseTime().hour,
+      minute: this.timeObj.getJapaneseTime().minute,
+      second: this.timeObj.getJapaneseTime().second,
+    };
+
     this.clockHand = new ClockHand(); // 時計の針
 
     // レンダラーの設定
@@ -38,9 +48,7 @@ export default class Base {
     this.arrangeObjectsInCircle(12, 20, -5, 5, this.timeGroup); // 時
 
     // 時計の針を追加
-    this.scene.add(this.clockHand.createClockHand(10, "secondHand", 0.01)); // 秒針
-    this.scene.add(this.clockHand.createClockHand(12, "minuteHand", 0.03)); // 分針
-    this.scene.add(this.clockHand.createClockHand(18, "timeHand", 0.05)); // 時針
+    this.initClockHands();
 
     // 中心の立方体の作成
     this.createCenterObject();
@@ -51,21 +59,58 @@ export default class Base {
     this.resizeHandler();
   }
 
+  // 針の初期化
+  initClockHands() {
+    this.scene.add(this.clockHand.createClockHand(12, "timeHand", 0.1)); // 時針
+    this.scene.add(
+      this.clockHand.createClockHand(18, "minuteHand", 0.05, 0xff00ff)
+    ); // 分針
+    this.scene.add(
+      this.clockHand.createClockHand(16, "secondHand", 0.03, 0x00ff00)
+    ); // 秒針
+
+    const hourHandPosition = this.clockHand.calculateHourHandPosition(
+      this.now.hour
+    );
+    const minuteHandPosition = this.clockHand.calculateMinuteSecondHandPosition(
+      this.now.minute
+    );
+    const secondHandPosition = this.clockHand.calculateMinuteSecondHandPosition(
+      this.now.second
+    );
+
+    // 針の初期位置を設定
+    this.scene.getObjectByName("secondHand").rotation.y -= secondHandPosition;
+    this.scene.getObjectByName("minuteHand").rotation.y -= minuteHandPosition;
+    this.scene.getObjectByName("timeHand").rotation.y -= hourHandPosition;
+  }
+
   init() {
     // アニメーションループ
-    const animate = () => {
-      requestAnimationFrame(animate);
-      // this.minutesGroup.rotation.y += 0.01;
+    // const animate = () => {
+    //   requestAnimationFrame(animate);
+    //   // this.minutesGroup.rotation.y += 0.01;
 
-      // this.scene.getObjectByName("secondHand").rotation.y -= 0.03; // 秒針
-      // this.scene.getObjectByName("minuteHand").rotation.y -= 0.02; // 秒針
-      // this.scene.getObjectByName("timeHand").rotation.y -= 0.01; // 分針
+    //   this.scene.getObjectByName("secondHand").rotation.y -= 0.03; // 秒針
+    //   // this.scene.getObjectByName("minuteHand").rotation.y -= 0.02; // 秒針
+    //   // this.scene.getObjectByName("timeHand").rotation.y -= 0.01; // 分針
 
-      // レンダリング
+    //   // レンダリング
+    //   this.renderer.render(this.scene, this.camera);
+    // };
+
+    // animate();
+    const update = (callback) => {
+      if ((Math.round(callback / 10) * 10) % 1000 == 0) {
+        //処理
+        this.scene.getObjectByName("secondHand").rotation.y -=
+          Utility.degree2Radian(360 / 60);
+      }
+
+      requestAnimationFrame(update);
       this.renderer.render(this.scene, this.camera);
     };
-
-    animate();
+    requestAnimationFrame(update);
   }
 
   // リサイズ処理
